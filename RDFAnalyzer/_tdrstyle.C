@@ -44,7 +44,7 @@ void setTDRStyle(bool fatline=true) {
   tdrStyle->SetMarkerStyle(20);
 
   //For the fit/function:
-  tdrStyle->SetOptFit(1);
+  tdrStyle->SetOptFit(1111);
   tdrStyle->SetFitFormat("5.4g");
   tdrStyle->SetFuncColor(2);
   tdrStyle->SetFuncStyle(1);
@@ -61,7 +61,7 @@ void setTDRStyle(bool fatline=true) {
   //tdrStyle->SetOptStat("oueMri"); // To display the mean and RMS:   SetOptStat("mr");
   tdrStyle->SetStatColor(kWhite);
   tdrStyle->SetStatFont(42);
-  tdrStyle->SetStatFontSize(0.025);
+  tdrStyle->SetStatFontSize(0.02);
   tdrStyle->SetStatTextColor(1);
   tdrStyle->SetStatFormat("4.2e");
   tdrStyle->SetStatBorderSize(1);

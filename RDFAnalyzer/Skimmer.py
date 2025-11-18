@@ -4,6 +4,7 @@ from argparse import ArgumentParser
 
 parser = ArgumentParser()
 parser.add_argument('--directory','-d', dest='directory', type=str)
+parser.add_argument('--infile','-i', dest='infile', type=str)
 args = parser.parse_args()
 
 toDefine = {
@@ -16,15 +17,16 @@ if __name__=='__main__':
 
     book = {}
 
-    for file in os.listdir(args.directory):
+    if args.directory: filelist = [f"{args.directory}/{f}" for f in os.listdir(args.directory)]
+    if args.infile:    filelist = [args.infile]
+    for file in filelist:
         if not file.endswith('.root'): continue
-        fname = f"{args.directory}/{file}"
-        print(f"Processing file {fname} ...")
+        print(f"Processing file {file} ...")
         book[file] = {}
         
         # Load tree
         print("Loading tree...")
-        f_read = R.TFile(str(fname),"READ")
+        f_read = R.TFile(str(file),"READ")
         tree_read = f_read.Get('Events')
         tree_read.SetBranchStatus("*",0)
         for br in SELECT_BRANCHES:
@@ -32,6 +34,7 @@ if __name__=='__main__':
 
         # Write new tree
         print("Writing tree...")
-        with R.TFile.Open(f"{args.directory}_skimmed/{file.split('.')[0]_skimmed.root}","RECREATE") as f_write:
+        print(f"../data_skimmed/{file.split('.')[0]}_skimmed.root")
+        with R.TFile.Open(f"../data_skimmed/{file.split('.')[0]}_skimmed.root","RECREATE") as f_write:
             tree_write = tree_read.CloneTree()
             tree_write.Write()
