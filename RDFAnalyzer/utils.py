@@ -1,5 +1,12 @@
 import ROOT as R
+from numpy import array
 R.gROOT.ProcessLine(".L tools.C")
+
+# ---- CONSTANTS ----
+DATA_PATH = "../data_skimmed/Run2016G_MET_NANOAOD_UL2016_MiniAODv2_NanoAODv9-v1_270000_6A4F07DD-F1D1-164F-B509-AFBA9877D6D5_skimmed.root"
+pogIds = ["Muon_looseId==1",
+          "Muon_mediumId==1",
+          "Muon_tightId==1"]
 
 histpars = {
         "nMuon":    {
@@ -96,10 +103,27 @@ def loadRDF(tree, filename):
 
 colors = [R.kViolet+1, R.kOrange+1]
 
+def drawOverflow(hist : 'R.TH1', title, xlog=False):
+    name = hist.GetName()
+    nbins = hist.GetNbinsX() + 1 
+    xbins = [hist.GetBinLowEdge(i+1) for i in range(nbins)] + [hist.GetBinLowEdge(nbins)+hist.GetBinWidth(nbins)]
+    xmin  = hist.GetBinLowEdge(1)
+
+    htmp = R.TH1D(name, title, nbins, array(xbins))
+    htmp.Sumw2()
+
+    [htmp.SetBinContent(i,hist.GetBinContent(i)) for i in range(1, nbins+2)]
+    [htmp.SetBinError(i,hist.GetBinError(i)) for i in range(1, nbins+2)]
+    
+    htmp.SetEntries(hist.GetEntries())
+    return htmp
+
 def plot(c, h, color=R.kViolet+1, xmin=None, xmax=None, logy=True):
     c.cd()
     if type(h)!=list: h = [h]
     for i,h_temp in enumerate(h):
+        #h_temp = drawOverflow(h_temp, h_temp.GetTitle())
+        #h_temp.SetDirectory(0)
         h_temp.SetLineWidth(2)
         h_temp.SetLineColor(colors[i])
         h_temp.SetFillColorAlpha(colors[i],0.3)
@@ -117,7 +141,8 @@ def plot(c, h, color=R.kViolet+1, xmin=None, xmax=None, logy=True):
     if logy: c.SetLogy(1)
     return c
 
-def plot_with_fit(c, h, fit="gaussian", color=R.kViolet+1, xmin=None, xmax=None, logy=True):
+def plot_with_fit(c, h, fit="gaussian", color=R.kViolet+1, 
+                  xmin=None, xmax=None, logy=True, fit_range=[60.,120.]):
     h_temp = h
     h_temp.SetDirectory(0)
     c.cd()
@@ -135,17 +160,17 @@ def plot_with_fit(c, h, fit="gaussian", color=R.kViolet+1, xmin=None, xmax=None,
 
     # Perform the fit
     if fit=="gaussian":
-        f = R.TF1(fit,"gaus",60.,120.)
+        f = R.TF1(fit,"gaus",fit_range[0],fit_range[1])
     elif fit=="bw":
-        f = R.TF1(fit,"[0]*TMath::BreitWigner(x,[2],[1])",80.,100.)
-        f.SetParameter(0, 1)
-        f.SetParameter(2, 5)
-        f.SetParameter(1, 91)
+        f = R.TF1(fit,"[0]*TMath::BreitWigner(x,[2],[1])",fit_range[0],fit_range[1])
+        f.SetParameter(0, 100)
+        f.SetParameter(1, 5)
+        f.SetParameter(2, 91)
         f.SetParName(0,"Normalization")
         f.SetParName(1,"Z Width")
         f.SetParName(2,"Z Mass")
     elif fit=="conv":
-        f = R.TF1(fit,"[3]*TMath::Voigt(x-[0],[1],[2],4)",60.,120.)
+        f = R.TF1(fit,"[3]*TMath::Voigt(x-[0],[1],[2],4)",fit_range[0],fit_range[1])
         f.SetParameter(0,h_temp.GetMean())
         f.SetParameter(1,h_temp.GetRMS())
         f.SetParameter(2,2.4)
