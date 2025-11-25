@@ -5,11 +5,8 @@ from argparse import ArgumentParser
 parser = ArgumentParser()
 parser.add_argument('--directory','-d', dest='directory', type=str)
 parser.add_argument('--infile','-i', dest='infile', type=str)
+parser.add_argument('--outfile','-o', dest='outfile', type=str)
 args = parser.parse_args()
-
-toDefine = {
-        'Dimuon_invMass', 'invMass(Muon_pt, Muon_eta, Muon_phi)',
-        }
 
 SELECT_BRANCHES = ["run","luminosityBlock","event","Muon_*","nMuon"]
 
@@ -34,7 +31,10 @@ if __name__=='__main__':
 
         # Write new tree
         print("Writing tree...")
-        print(f"../data_skimmed/{file.split('.')[0]}_skimmed.root")
-        with R.TFile.Open(f"../data_skimmed/{file.split('.')[0]}_skimmed.root","RECREATE") as f_write:
-            tree_write = tree_read.CloneTree()
-            tree_write.Write()
+        print(f"{args.outfile}")
+        f_write = R.TFile.Open(f"{args.outfile}","RECREATE")
+        tree_write = tree_read.CloneTree()
+        tree_write.Write()
+        f_write.Close()
+        
+        f_read.Close()

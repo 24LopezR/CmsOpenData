@@ -25,7 +25,13 @@
 using namespace ROOT;
 using namespace ROOT::VecOps;
 
-float invariantMass(RVecF pt, RVecF eta, RVecF phi) {
+RVec<bool> isGoodMuon(RVec<bool> cutstring) {
+  return cutstring;
+}
+
+float invariantMass(RVec<float> pt, RVec<float> eta, RVec<float> phi) {
+  if (pt.size()<2) return -999.;
+  
   float muMass = 0.105658375;
 
   //Calculates the dimuon mass given 4-vector components of both muons
@@ -40,10 +46,10 @@ float invariantMass(RVecF pt, RVecF eta, RVecF phi) {
   return dim.M();
 }
 
-float invariantMass(const RVecI &isGoodMuon,
-	            const RVecF &pt,
-		    const RVecF &eta,
-		    const RVecF &phi) {
+float invariantMass(const RVec<int> &isGoodMuon,
+                    const RVec<float> &pt,
+                    const RVec<float> &eta,
+                    const RVec<float> &phi) {
   std::vector<int> goodMuons;
   for (int i=0; i<isGoodMuon.size(); i++) {
     if (isGoodMuon[i] == 1) goodMuons.push_back(i);

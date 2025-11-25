@@ -3,18 +3,13 @@ from numpy import array
 R.gROOT.ProcessLine(".L tools.C")
 
 # ---- CONSTANTS ----
-DATA_PATH = "../data_skimmed/Run2016G_MET_NANOAOD_UL2016_MiniAODv2_NanoAODv9-v1_270000_6A4F07DD-F1D1-164F-B509-AFBA9877D6D5_skimmed.root"
+#DATA_PATH = "~/work/CmsOpenData/data_skimmed/Run2016G_MET_NANOAOD_UL2016_MiniAODv2_NanoAODv9-v1_270000_6A4F07DD-F1D1-164F-B509-AFBA9877D6D5_skimmed.root"
+DATA_PATH = "~/share/rootfiles/Run2016G_MET_NANOAOD_UL2016_MiniAODv2_NanoAODv9-v1_270000_6A4F07DD-F1D1-164F-B509-AFBA9877D6D5_skimmed.root"
 pogIds = ["Muon_looseId==1",
           "Muon_mediumId==1",
           "Muon_tightId==1"]
 
 histpars = {
-        "nMuon":    {
-            "xlabel": "N muons",
-            "bins": 10,
-            "xmin": 0,
-            "xmax": 10,
-            "name": "Number of muons in the event"},
         "Muon_dxy":    {
             "xlabel": "muon d_{xy} (cm)",
             "bins": 100,
@@ -91,7 +86,7 @@ histpars = {
 
 toDefine = {
         "DiMuon_invMass":  "invariantMass(Muon_pt, Muon_eta, Muon_phi)",
-        "Muon_isGoodMuon": "return RVecI()",
+#        "Muon_isGoodMuon": "return RVec<int>()",
 #        "Muon_type":      "return RVecI({1*Muon_isStandalone,2*Muon_isTracker,3*Muon_isGlobal})",
     }
 
@@ -181,7 +176,7 @@ def plot_with_fit(c, h, fit="gaussian", color=R.kViolet+1,
         f.SetParName(3,"Normalization")
     f.SetLineWidth(2)
     f.SetLineColor(R.kRed)
-    h_temp.Fit(f"{fit}")
+    h_temp.Fit(f,"R")
     h_temp.Draw("HIST")
     f.Draw("SAME")
     return c
