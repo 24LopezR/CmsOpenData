@@ -153,7 +153,8 @@ def plot(c, hists=None, colors=[R.kViolet+1],
     return c
 
 def plotFit(c, h, fit="gaussian", color=R.kViolet+1, 
-                  xmin=None, xmax=None, logy=True, fit_range=[60.,120.]):
+            xmin=None, xmax=None, logy=True, fit_range=[60.,120.],
+            params=[1000.,1.,90.]):
     h_temp = h
     h_temp.SetDirectory(0)
     c.cd()
@@ -171,21 +172,27 @@ def plotFit(c, h, fit="gaussian", color=R.kViolet+1,
 
     # Perform the fit
     if fit=="gaussian":
-        f = R.TF1(fit,"gaus",fit_range[0],fit_range[1])
+        f = R.TF1(fit,"[0]*TMath::Gaus(x,[2],2*[1],1)",fit_range[0],fit_range[1])
+        f.SetParameter(0, params[0])
+        f.SetParameter(1, params[1])
+        f.SetParameter(2, params[2])
+        f.SetParName(0,"Normalization")
+        f.SetParName(1,"Z Width")
+        f.SetParName(2,"Z Mass")
     elif fit=="bw":
-        f = R.TF1(fit,"[0]*TMath::BreitWignerRelativistic(x,[2],[1])",fit_range[0],fit_range[1])
-        f.SetParameter(0, 100)
-        f.SetParameter(1, 5)
-        f.SetParameter(2, 91)
+        f = R.TF1(fit,"[0]*BreitWignerRelativistic(x,[2],2*[1])",fit_range[0],fit_range[1])
+        f.SetParameter(0, params[0])
+        f.SetParameter(1, params[1])
+        f.SetParameter(2, params[2])
         f.SetParName(0,"Normalization")
         f.SetParName(1,"Z Width")
         f.SetParName(2,"Z Mass")
     elif fit=="conv":
-        f = R.TF1(fit,"[3]*TMath::Voigt(x-[0],[1],[2],4)",fit_range[0],fit_range[1])
-        f.SetParameter(0,h_temp.GetMean())
+        f = R.TF1(fit,"[3]*TMath::Voigt(x-[0],[1],2*[2],4)",fit_range[0],fit_range[1])
+        f.SetParameter(0,params[2])
         f.SetParameter(1,h_temp.GetRMS())
-        f.SetParameter(2,2.4)
-        f.SetParameter(3,400)
+        f.SetParameter(2,params[1])
+        f.SetParameter(3,params[0])
         f.SetParName(0,"Z Mass")
         f.SetParName(1,"Exp. Resolution")
         f.SetParName(2,"Z Width")
