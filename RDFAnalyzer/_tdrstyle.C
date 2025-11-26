@@ -112,7 +112,7 @@ void setTDRStyle(bool fatline=true) {
   tdrStyle->SetOptLogy(0);
   tdrStyle->SetOptLogz(1);
 
-  tdrStyle->SetPaintTextFormat("4.3f");
+  tdrStyle->SetPaintTextFormat("4.0f");
   tdrStyle->SetLegendBorderSize(0);
   tdrStyle->SetLegendFillColor(4000);
   tdrStyle->SetLegendFont(42);
